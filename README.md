@@ -24,19 +24,19 @@ cmake --build build --parallel
 
 Navigate to `build/` directory. There are 6 examples:
 - `resnet_single`: reading a single image and inferencing to a single feature
-    - `resnet_single` <model path> <input img path>
+    - `resnet_single` [model path] [input img path]
 - `resnet_batch`: reading a batch of images and inferencing to a batch of features
-    - resnet_batch <model path> <input path>
+    - resnet_batch [model path] [input path]
 - `resnet_export_feature`: exporting a batch of features and classes to tsv files
-    - resnet_export_feature <model path> <input path> <feature path> <class path>
+    - resnet_export_feature [model path] [input path] [feature path] [class path]
 - `yolov8_single`: reading a single image and export bounding boxes result to output image
-    - yolov8_single <model path> <input img path> <output img path>
+    - yolov8_single [model path] [input img path] [output img path]
 - `yolov8_batch`: reading a batch of images
-    - yolov8_batch <model path> <input dir path>
+    - yolov8_batch [model path] [input dir path]
 - `yolov8_export_image`: reading a batch of images and export bounding boxes result to output image
-    - yolov8_export_image <model path> <input dir path> <output dir path>
+    - yolov8_export_image [model path] [input dir path] [output dir path]
 
-exery example with `-h` option, you can get the help message. For example:
+Every example with `-h` option, you can get the help message. For example:
 
 ```sh
 $ yolov8_export_image -h
