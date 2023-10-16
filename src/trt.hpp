@@ -67,6 +67,9 @@ public:
 
   /** @brief inference a flatten batch of cv::cuda::GpuMat, return a vector of
    * float. User should reorder output yourself.
+   * @param flatten_inputs flatten batch of cv::cuda::GpuMat
+   * @param batch_size number of batch
+   * @param outputs output vector of float
    */
   void run(cv::cuda::GpuMat &flatten_inputs, const uint32_t &batch_size,
            std::vector<float> &outputs);
