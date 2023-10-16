@@ -30,6 +30,7 @@ void parse_args(int argc, char *argv[]) {
     ("h,help", "help");
   options.parse_positional({"model", "input", "feature", "class"});
   options.positional_help("<model path> <input path> <feature path> <class path>");
+  options.show_positional_help();
   auto result = options.parse(argc, argv);
   // clang-format on
 

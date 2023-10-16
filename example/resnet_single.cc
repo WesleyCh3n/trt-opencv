@@ -26,6 +26,7 @@ void parse_args(int argc, char *argv[]) {
     ("h,help", "help");
   options.parse_positional({"model", "input"});
   options.positional_help("<model path> <input img path>");
+  options.show_positional_help();
   auto result = options.parse(argc, argv);
   // clang-format on
   try {
