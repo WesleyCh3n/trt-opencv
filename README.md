@@ -1,4 +1,7 @@
-# **T**ensor**RT** with OpenCV
+# [**T**]ensor[**RT**] with OpenCV
+
+A example wrapper for inferencing TensorRT with OpenCV as input. And some other
+utilities for preprocessing and postprocessing images.
 
 ## Tested Environment
 
