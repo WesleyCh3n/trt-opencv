@@ -24,19 +24,35 @@ cmake --build build --parallel
 
 Navigate to `build/` directory. There are 6 examples:
 - `resnet_single`: reading a single image and inferencing to a single feature
-    - `resnet_single` [OPTION...] <model path> <input img path>
+    - `resnet_single` <model path> <input img path>
 - `resnet_batch`: reading a batch of images and inferencing to a batch of features
-    - resnet_batch [OPTION...] <model path> <input path>
+    - resnet_batch <model path> <input path>
 - `resnet_export_feature`: exporting a batch of features and classes to tsv files
-    - resnet_export_feature [OPTION...] <model path> <input path> <feature path> <class path>
+    - resnet_export_feature <model path> <input path> <feature path> <class path>
 - `yolov8_single`: reading a single image and export bounding boxes result to output image
-    - yolov8_single [OPTION...] <model path> <input img path> <output img path>
+    - yolov8_single <model path> <input img path> <output img path>
 - `yolov8_batch`: reading a batch of images
-    - yolov8_batch [OPTION...] <model path> <input dir path>
+    - yolov8_batch <model path> <input dir path>
 - `yolov8_export_image`: reading a batch of images and export bounding boxes result to output image
-    - yolov8_export_image [OPTION...] <model path> <input dir path> <output dir path>
+    - yolov8_export_image <model path> <input dir path> <output dir path>
 
-exery example with `-h` option, you can get the help message.
+exery example with `-h` option, you can get the help message. For example:
+
+```sh
+$ yolov8_export_image -h
+TensorRT Resnet50 batch predict and save image example
+Usage:
+  yolov8_export_image [OPTION...] <model path> <input dir path> <output dir path>
+
+      --model arg     model path
+      --input arg     input image root dir w/ sub-folder classes
+      --output arg    output dir path
+  -b, --batch arg     batch size (default: 64)
+  -m, --maxbatch arg  max batch size of model (default: 64)
+  -h, --help          help
+```
+
+Walk through the examples will help you have a better understanding of how to use this library.
 
 ## References
 
