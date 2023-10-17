@@ -128,6 +128,78 @@ reorder channel to `[2, 3, 640, 640]`. finally, output should be 1D GpuMat
 
 #### Post-process
 
+- Yolov8 post-processing
+
+Create utility instance with builder:
+```cpp
+auto yolo_util = trt::utils::YoloUtility::create()
+                   .set_original_size(cv::Size(1280, 720)) // original image size
+                   .set_input_size(cv::Size(640, 640)) // model input size
+                   .set_conf_threshold(0.5) // confidence threshold
+                   .set_nms_threshold(0.5) // nms threshold
+                   .set_num_bbox(8400) // number of bbox
+                   .is_xywhs(); // output only one class
+```
+
+Post-process:
+```cpp
+// single image
+std::vector<cv::Rect> rects;
+std::vector<float> confs;
+std::vector<int> idxes;
+yolo_util.post_process(outputs.data(), rects, confs, idxes);
+
+// batch images
+std::vector<std::vector<cv::Rect>> rects(batch_size);
+std::vector<std::vector<float>> confs(batch_size);
+std::vector<std::vector<int>> idxes(batch_size);
+yolo_util.batch_post_process(outputs, inputs.size(), rects, confs, idxes);
+```
+
+## Example
+
+Read a single image and inferencing to yolov8 model
+```cpp
+trt::EngineOption model_option{.max_batch_size = 64};
+trt::Engine model("yolov8n.trt", model_option);
+
+// get input image
+auto cpumat = cv::imread("your/image.jpg");
+auto gpumat = cv::cuda::GpuMat(cpumat);
+
+auto yolo_util = trt::utils::YoloUtility::create()
+                   .set_original_size(cpu_images.size()) // original image size
+                   .set_input_size(cv::Size(640, 640)) // model input size
+                   .set_conf_threshold(0.5) // confidence threshold
+                   .set_nms_threshold(0.5) // nms threshold
+                   .set_num_bbox(8400) // number of bbox
+                   .is_xywhs(); // output only one class
+
+// transform image
+auto blob = trt::utils::blob_from_gpumat(
+  gpumat,                                          // input gpumats
+  std::array<uint32_t, 2>{640, 640},               // resize
+  std::array<float, 3>{1, 1, 1},                   // std factor
+  std::array<float, 3>{0, 0, 0}                    // mean
+);
+
+// run model inference
+std::vector<float> outputs;
+model.run(blob, 1, outputs);
+
+// post process output
+std::vector<cv::Rect> rects;
+std::vector<float> confs;
+std::vector<int> idxes;
+yolo_util.post_process(outputs.data(), rects, confs, idxes);
+
+// draw result
+for (const auto &idx : idxes) {
+  cv::rectangle(cpumat, rects[idx], cv::Scalar(0, 255, 0));
+}
+```
+
+
 ## References
 
 - [tensorrt-cpp-api](https://github.com/cyrusbehr/tensorrt-cpp-api)
