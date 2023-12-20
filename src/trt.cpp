@@ -50,7 +50,7 @@ trt::Engine::Engine(const std::string_view model_path,
   }
 
   int32_t num_io_tensors = engine_->getNbIOTensors();
-  spdlog::info("number of IO tensors: {}", num_io_tensors);
+  spdlog::trace("number of IO tensors: {}", num_io_tensors);
   io_tensors_buf_.resize(num_io_tensors);
   io_tensors_name_.resize(num_io_tensors);
 
@@ -62,15 +62,15 @@ trt::Engine::Engine(const std::string_view model_path,
     io_tensors_name_[i] = tensor_name;
     const auto tensor_shape = engine_->getTensorShape(tensor_name);
     const auto tensor_type = engine_->getTensorIOMode(tensor_name);
-    spdlog::info("idx: {}, name: {}", i, tensor_name);
+    spdlog::trace("idx: {}, name: {}", i, tensor_name);
     for (int i = 0; i < tensor_shape.nbDims; i++) {
-      spdlog::info("        shape[{}]: {}", i, tensor_shape.d[i]);
+      spdlog::trace("        shape[{}]: {}", i, tensor_shape.d[i]);
     }
-    spdlog::info("max batch size: {}", option_.max_batch_size);
+    spdlog::trace("max batch size: {}", option_.max_batch_size);
     const auto tensor_max_bytes = std::accumulate(
         tensor_shape.d + 1, tensor_shape.d + tensor_shape.nbDims,
         sizeof(float) * option_.max_batch_size, std::multiplies<uint64_t>());
-    spdlog::info("tensor max bytes: {}", tensor_max_bytes);
+    spdlog::trace("tensor max bytes: {}", tensor_max_bytes);
 
     if (tensor_type == nvinfer1::TensorIOMode::kINPUT) {
       input_dims_ = tensor_shape;
