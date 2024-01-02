@@ -4,3 +4,4 @@ model
 out
 *.tsv
 *.jpg
+*.txt

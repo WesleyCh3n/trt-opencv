@@ -1,0 +1,82 @@
+[
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build",
+  "command": "/usr/bin/c++ -DJPEG_FOUND -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -DWITH_CUDA -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/include -I/opt/TensorRT-8.6.1.6/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/cxxopts-src/include -isystem /opt/libtorch/include -isystem /opt/libtorch/include/torch/csrc/api/include -isystem /usr/local/include/opencv4 -isystem /usr/local/cuda-12.3/include -isystem /opt/libtorchvision/include -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=1 -fopenmp -o CMakeFiles/yolov8_single.dir/example/yolov8_single.cc.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/example/yolov8_single.cc",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/example/yolov8_single.cc"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build",
+  "command": "/usr/bin/c++ -DJPEG_FOUND -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -DWITH_CUDA -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/include -I/opt/TensorRT-8.6.1.6/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/cxxopts-src/include -isystem /opt/libtorch/include -isystem /opt/libtorch/include/torch/csrc/api/include -isystem /usr/local/include/opencv4 -isystem /usr/local/cuda-12.3/include -isystem /opt/libtorchvision/include -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=1 -fopenmp -o CMakeFiles/yolov8_single.dir/example/dnn.cpp.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/example/dnn.cpp",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/example/dnn.cpp"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build",
+  "command": "/usr/bin/c++ -DJPEG_FOUND -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -DWITH_CUDA -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/include -I/opt/TensorRT-8.6.1.6/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/cxxopts-src/include -isystem /opt/libtorch/include -isystem /opt/libtorch/include/torch/csrc/api/include -isystem /usr/local/include/opencv4 -isystem /usr/local/cuda-12.3/include -isystem /opt/libtorchvision/include -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=1 -fopenmp -o CMakeFiles/yolov8_single.dir/src/trt_engine.cc.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/src/trt_engine.cc",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src/trt_engine.cc"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build",
+  "command": "/usr/bin/c++ -DJPEG_FOUND -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -DWITH_CUDA -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/include -I/opt/TensorRT-8.6.1.6/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/cxxopts-src/include -isystem /opt/libtorch/include -isystem /opt/libtorch/include/torch/csrc/api/include -isystem /usr/local/include/opencv4 -isystem /usr/local/cuda-12.3/include -isystem /opt/libtorchvision/include -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=1 -fopenmp -o CMakeFiles/yolov8_single.dir/src/trt_utils.cc.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/src/trt_utils.cc",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src/trt_utils.cc"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build",
+  "command": "/usr/bin/c++ -DJPEG_FOUND -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -DWITH_CUDA -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/include -I/opt/TensorRT-8.6.1.6/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/cxxopts-src/include -isystem /opt/libtorch/include -isystem /opt/libtorch/include/torch/csrc/api/include -isystem /usr/local/include/opencv4 -isystem /usr/local/cuda-12.3/include -isystem /opt/libtorchvision/include -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=1 -fopenmp -o CMakeFiles/yolov8_export_image.dir/example/yolov8_export_image.cc.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/example/yolov8_export_image.cc",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/example/yolov8_export_image.cc"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build",
+  "command": "/usr/bin/c++ -DJPEG_FOUND -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -DWITH_CUDA -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/include -I/opt/TensorRT-8.6.1.6/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/cxxopts-src/include -isystem /opt/libtorch/include -isystem /opt/libtorch/include/torch/csrc/api/include -isystem /usr/local/include/opencv4 -isystem /usr/local/cuda-12.3/include -isystem /opt/libtorchvision/include -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=1 -fopenmp -o CMakeFiles/yolov8_export_image.dir/example/dnn.cpp.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/example/dnn.cpp",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/example/dnn.cpp"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build",
+  "command": "/usr/bin/c++ -DJPEG_FOUND -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -DWITH_CUDA -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/include -I/opt/TensorRT-8.6.1.6/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/cxxopts-src/include -isystem /opt/libtorch/include -isystem /opt/libtorch/include/torch/csrc/api/include -isystem /usr/local/include/opencv4 -isystem /usr/local/cuda-12.3/include -isystem /opt/libtorchvision/include -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=1 -fopenmp -o CMakeFiles/yolov8_export_image.dir/src/trt_engine.cc.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/src/trt_engine.cc",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src/trt_engine.cc"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build",
+  "command": "/usr/bin/c++ -DJPEG_FOUND -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE -DWITH_CUDA -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/include -I/opt/TensorRT-8.6.1.6/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/cxxopts-src/include -isystem /opt/libtorch/include -isystem /opt/libtorch/include/torch/csrc/api/include -isystem /usr/local/include/opencv4 -isystem /usr/local/cuda-12.3/include -isystem /opt/libtorchvision/include -O3 -DNDEBUG -D_GLIBCXX_USE_CXX11_ABI=1 -fopenmp -o CMakeFiles/yolov8_export_image.dir/src/trt_utils.cc.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/src/trt_utils.cc",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/src/trt_utils.cc"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-build",
+  "command": "/usr/bin/c++  -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -O3 -DNDEBUG -o CMakeFiles/fmt.dir/src/format.cc.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/src/format.cc",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/src/format.cc"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-build",
+  "command": "/usr/bin/c++  -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -O3 -DNDEBUG -o CMakeFiles/fmt.dir/src/os.cc.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/src/os.cc",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/src/os.cc"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -O3 -DNDEBUG -o CMakeFiles/spdlog.dir/src/spdlog.cpp.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/spdlog.cpp",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/spdlog.cpp"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -O3 -DNDEBUG -o CMakeFiles/spdlog.dir/src/stdout_sinks.cpp.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/stdout_sinks.cpp",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/stdout_sinks.cpp"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -O3 -DNDEBUG -o CMakeFiles/spdlog.dir/src/color_sinks.cpp.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/color_sinks.cpp",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/color_sinks.cpp"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -O3 -DNDEBUG -o CMakeFiles/spdlog.dir/src/file_sinks.cpp.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/file_sinks.cpp",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/file_sinks.cpp"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -O3 -DNDEBUG -o CMakeFiles/spdlog.dir/src/async.cpp.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/async.cpp",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/async.cpp"
+},
+{
+  "directory": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-build",
+  "command": "/usr/bin/c++ -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/include -I/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/fmt-src/include -O3 -DNDEBUG -o CMakeFiles/spdlog.dir/src/cfg.cpp.o -c /home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/cfg.cpp",
+  "file": "/home/wesley/GitHub/opencv-tensorrt-cpp-toy/build/_deps/spdlog-src/src/cfg.cpp"
+}
+]

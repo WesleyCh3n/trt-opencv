@@ -4,6 +4,8 @@
 #include <numeric> //std::accumulate
 #include <spdlog/spdlog.h>
 
+#include <torch/torch.h>
+
 //===================================================================================
 // TensorRT Logger
 //===================================================================================
@@ -134,6 +136,54 @@ void trt::Engine::run(cv::cuda::GpuMat &flatten_inputs,
 
   check_cuda_err(cudaStreamSynchronize(stream));
   check_cuda_err(cudaStreamDestroy(stream));
+}
+
+void deleter(void *arg) { cudaFree(arg); };
+
+torch::Tensor trt::Engine::run(cv::cuda::GpuMat &flatten_inputs,
+                               const uint32_t &batch_size) {
+  input_dims_.d[0] = batch_size; // Define the batch size
+  context_->setInputShape(io_tensors_name_[0], input_dims_);
+
+  cudaStream_t stream;
+  check_cuda_err(cudaStreamCreate(&stream));
+
+  auto *data_ptr = flatten_inputs.ptr<void>();
+  check_cuda_err(cudaMemcpyAsync(io_tensors_buf_[0], data_ptr,
+                                 flatten_inputs.rows * flatten_inputs.cols *
+                                     flatten_inputs.channels() * sizeof(float),
+                                 cudaMemcpyDeviceToDevice, stream));
+  if (context_->inferShapes(1, io_tensors_name_.data()) != 0) {
+    throw EngineException("Failed to infer shapes");
+  }
+  if (!context_->allInputDimensionsSpecified()) {
+    throw EngineException("Not all input dimensions are specified");
+  }
+  for (uint32_t i = 0; i < (uint32_t)io_tensors_buf_.size(); i++) {
+    if (!context_->setTensorAddress(io_tensors_name_[i], io_tensors_buf_[i])) {
+      throw EngineException("Failed to set tensor address");
+    }
+  }
+  if (!context_->enqueueV3(stream)) {
+    throw EngineException("Failed to enqueue");
+  }
+
+  float *outputs;
+  cudaMalloc((void **)&outputs,
+             sizeof(float) * batch_size * single_output_len_);
+  check_cuda_err(
+      cudaMemcpyAsync(outputs, static_cast<char *>(io_tensors_buf_[1]),
+                      batch_size * single_output_len_ * sizeof(float),
+                      cudaMemcpyDeviceToDevice, stream));
+  check_cuda_err(cudaStreamSynchronize(stream));
+  check_cuda_err(cudaStreamDestroy(stream));
+
+  auto output_dims = engine_->getTensorShape(io_tensors_name_[1]);
+  auto dim = std::vector<int64_t>(output_dims.d + 1,
+                                  output_dims.d + 1 + output_dims.nbDims - 1);
+  dim.insert(dim.begin(), batch_size);
+
+  return torch::from_blob(outputs, dim, deleter, torch::kCUDA);
 }
 
 std::vector<uint32_t> trt::Engine::get_input_dims() {

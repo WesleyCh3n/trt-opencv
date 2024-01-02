@@ -1,14 +1,20 @@
 #include <filesystem>
+#include <fstream>
 
 #include <cxxopts.hpp>
+#include <fmt/chrono.h>
+#include <fmt/core.h>
+#include <fmt/ranges.h>
 #include <opencv2/opencv.hpp>
 
 #include "trt.hpp"
 #include "utils.hpp"
 
+namespace fs = std::filesystem;
 namespace global {
 std::string model_path;
 std::string dir_path;
+std::string output_path;
 uint32_t batch_size;
 uint32_t max_batch_size;
 } // namespace global
@@ -20,6 +26,7 @@ void parse_args(int argc, char *argv[]) {
   options.add_options()
     ("model", "model path", cxxopts::value<std::string>())
     ("input", "input image root dir w/ sub-folder classes", cxxopts::value<std::string>())
+    ("o,output", "output txt dir", cxxopts::value<std::string>())
     ("b,batch", "batch size", cxxopts::value<int>()->default_value("64"))
     ("m,maxbatch", "max batch size of model", cxxopts::value<int>()->default_value("64"))
     ("h,help", "help");
@@ -37,6 +44,7 @@ void parse_args(int argc, char *argv[]) {
     global::dir_path = result["input"].as<std::string>().c_str();
     global::batch_size = result["batch"].as<int>();
     global::max_batch_size = result["maxbatch"].as<int>();
+    global::output_path = result["output"].as<std::string>().c_str();
     assert(global::batch_size <= global::max_batch_size);
   } catch (const cxxopts::exceptions::exception &e) {
     spdlog::error(e.what());
@@ -76,13 +84,13 @@ void process_batch_img() {
   // get all image paths
   auto images_paths = get_images_path(global::dir_path);
   // get all image mats
-  auto cpu_images = get_images_mat(images_paths);
+  // auto cpu_images = get_images_mat(images_paths);
 
   // init yolo utility
   auto yolo_util = trt::utils::YoloUtility::create()
-                       .set_original_size(cpu_images[0].size())
+                       .set_original_size(cv::Size(1920, 1080))
                        .set_input_size(cv::Size(in_size[2], in_size[1]))
-                       .set_conf_threshold(0.5)
+                       .set_conf_threshold(0.2)
                        .set_nms_threshold(0.5)
                        .set_num_bbox(out_size[1]);
   if (out_size[0] == 5)
@@ -90,7 +98,10 @@ void process_batch_img() {
   yolo_util.show();
 
   // pre-allocate gpu mats
-  const uint32_t batch_size = global::batch_size;   // num of images per batch
+  const uint32_t batch_size =
+      images_paths.size() < global::batch_size
+          ? images_paths.size()
+          : global::batch_size;                     // num of images per batch
   std::vector<cv::cuda::GpuMat> inputs(batch_size); // pre-allocated gpu mats
   std::vector<float> outputs;
 
@@ -109,7 +120,8 @@ void process_batch_img() {
                  images_paths.size());
     // load batch images into gpu mats
     for (int idx = iteration * batch_size; idx < batch_end_idx; idx++) {
-      inputs[idx - iteration * batch_size] = cv::cuda::GpuMat(cpu_images[idx]);
+      inputs[idx - iteration * batch_size] =
+          cv::cuda::GpuMat(cv::imread(images_paths[idx]));
     }
 
     // if idx is last image(last batch), resize inputs to fit last batch
@@ -136,6 +148,25 @@ void process_batch_img() {
       // post process output
       yolo_util.batch_post_process(outputs, inputs.size(), rects, confs, idxes);
     }
+    for (int i = 0; i < idxes.size(); i++) {
+      if (idxes[i].size() == 0)
+        continue;
+      auto txt_path = fmt::format(
+          "{}.txt", (global::output_path /
+                     fs::path(images_paths[iteration * batch_size + i]).stem())
+                        .string());
+      std::ofstream ofs(txt_path);
+      for (auto &idx : idxes[i]) {
+        ofs << rects[i][idx].x << " " << rects[i][idx].y << " "
+            << rects[i][idx].x + rects[i][idx].width << " "
+            << rects[i][idx].y + rects[i][idx].height << " " << confs[i][idx]
+            << '\n';
+      }
+    }
+
+    // for (int i = 0; i < inputs.size(); i++) {
+    //   fmt::println("{: >2}: rect size: {}", i, idxes[i].size());
+    // }
   }
 }
 

@@ -2,8 +2,8 @@
 
 #include <cxxopts.hpp>
 
+#include "dnn.hpp"
 #include "trt.hpp"
-#include "utils.hpp"
 
 namespace global {
 std::string model_path;
@@ -48,54 +48,27 @@ void parse_args(int argc, char *argv[]) {
 }
 
 void process_single_img() {
-  trt::EngineOption model_option{.max_batch_size = global::max_batch_size};
-  trt::Engine model(global::model_path, model_option);
-  auto in_size = model.get_input_dims();
-  auto out_size = model.get_output_dims();
-  // in my case input are images with 3 channels, output are 512 feature
-  assert(in_size.size() == 3);                // CHW
-  assert(in_size[0] == 3 || in_size[0] == 1); // channel first
-
-  // read image into gpu
+  auto model = dnn::Yolo(global::model_path, global::max_batch_size);
   std::vector<float> outputs;
   auto cpumat = cv::imread(global::image_path);
+  fmt::println("cols: {} rows: {}", cpumat.cols, cpumat.rows);
   auto gpumat = cv::cuda::GpuMat(cpumat);
-
-  // init yolo utility
-  auto yolo_util = trt::utils::YoloUtility::create()
-                       .set_original_size(cpumat.size())
-                       .set_input_size(cv::Size(in_size[2], in_size[1]))
-                       .set_conf_threshold(0.5)
-                       .set_nms_threshold(0.5)
-                       .set_num_bbox(out_size[1]);
-  if (out_size[0] == 5)
-    yolo_util.is_xywhs();
-  yolo_util.show();
-
-  // transform image
-  auto blob = trt::utils::blob_from_gpumat(
-      gpumat,                                          // input gpumats
-      std::array<uint32_t, 2>{in_size[1], in_size[2]}, // resize
-      std::array<float, 3>{1, 1, 1},                   // std factor
-      std::array<float, 3>{0, 0, 0}                    // mean
-  );
-
-  // run model inference
-  model.run(blob, 1, outputs);
-
-  // post process output
-  std::vector<cv::Rect> rects;
-  std::vector<float> confs;
-  std::vector<int> idxes;
-  yolo_util.post_process(outputs.data(), rects, confs, idxes);
-
-  // draw result
-  for (const auto &idx : idxes) {
-    cv::rectangle(cpumat, rects[idx], cv::Scalar(0, 255, 0));
+  std::vector<cv::cuda::GpuMat> mats;
+  for (int i = 0; i < 16; i++) {
+    mats.emplace_back(gpumat.clone());
   }
-
-  // save result image
-  cv::imwrite(global::output_image_path, cpumat);
+  auto results = model.predict(mats);
+  for (auto &r : results) {
+    std::cout << r.size() << '\n';
+    for (int i = 0; i < r.size(); i++) {
+      std::cout << r[i].rect << '\n';
+    }
+  }
+  // auto results = model.predict(gpumat);
+  // for (const auto &r : results) {
+  //   cv::rectangle(cpumat, r.rect, cv::Scalar(0, 255, 0), 2);
+  // }
+  // cv::imwrite(global::output_image_path, cpumat);
 }
 
 int main(int argc, char *argv[]) {
