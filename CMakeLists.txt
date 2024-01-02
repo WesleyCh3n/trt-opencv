@@ -22,11 +22,12 @@ set(CAFFE2_USE_CUDNN ON)
 find_package(PythonInterp REQUIRED)
 find_package(Torch REQUIRED PATHS /opt/libtorch)
 find_package(TorchVision REQUIRED PATHS /opt/libtorchvision)
+list(APPEND TORCH_LIBRARIES libcupti.so)
+
+find_package(TensorRT REQUIRED)
 
 find_package(OpenMP REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(TensorRT REQUIRED)
-list(APPEND TORCH_LIBRARIES libcupti.so)
 
 include(cmake/CPM.cmake)
 if(BUILD_FMT)
@@ -44,8 +45,8 @@ if(BUILD_SPDLOG)
     NAME spdlog
     GIT_TAG v1.12.0
     GITHUB_REPOSITORY gabime/spdlog
-    OPTIONS "SPDLOG_INSTALL YES"
-    "SPDLOG_FMT_EXTERNAL YES"
+    OPTIONS "SPDLOG_FMT_EXTERNAL YES"
+    "SPDLOG_INSTALL YES"
   )
 else()
   find_package(spdlog REQUIRED)
@@ -90,23 +91,23 @@ list(APPEND INSTALL_TARGETS
   dnn
   )
 
-message(STATUS "Install targets: ${INSTALL_TARGETS}")
-message(STATUS "1.: ${CMAKE_INSTALL_BINDIR}")
-message(STATUS "2.: ${CMAKE_INSTALL_INCLUDEDIR}")
-message(STATUS "3.: ${CMAKE_INSTALL_DATADIR}")
+set(CONFIG_EXPORT_NAME wml-config)
+set(WML_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/wml)
+set(WML_SHARE_DIR share/wml)
+set(PROJECT_CONFIG ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_EXPORT_NAME}.cmake)
 
-install(TARGETS ${INSTALL_TARGETS} EXPORT WsConfig
+install(TARGETS ${INSTALL_TARGETS} EXPORT ${CONFIG_EXPORT_NAME}
         LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_BINDIR}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/wml)
 export(TARGETS ${INSTALL_TARGETS}
-       NAMESPACE ws::
-       FILE ${CMAKE_CURRENT_BINARY_DIR}/WsConfig.cmake)
-install(EXPORT WsConfig
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/ws"
-        NAMESPACE ws::
+       NAMESPACE wml::
+       FILE ${PROJECT_CONFIG})
+install(EXPORT ${CONFIG_EXPORT_NAME}
+        DESTINATION "${WML_CMAKE_DIR}"
+        NAMESPACE wml::
 )
+install(FILES ./cmake/FindTensorRT.cmake DESTINATION ${WML_SHARE_DIR})
 
 
 #==============================================================================

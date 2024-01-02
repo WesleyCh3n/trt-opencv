@@ -2,6 +2,7 @@
 
 #include <cxxopts.hpp>
 #include <opencv2/opencv.hpp>
+#include <spdlog/spdlog.h>
 
 #include "dnn.hpp"
 #include "trt.hpp"

@@ -3,7 +3,6 @@
 
 #include <NvInfer.h>
 #include <opencv2/core/cuda.hpp>
-#include <spdlog/spdlog.h>
 #include <torch/types.h>
 
 namespace trt {
@@ -19,9 +18,9 @@ public:
 /** @brief check cuda error */
 inline void check_cuda_err(cudaError_t code) {
   if (code != cudaSuccess) {
-    throw CudaException(fmt::format("[{}] {}: {}", (int)code,
-                                    cudaGetErrorName(code),
-                                    cudaGetErrorString(code)));
+    throw CudaException(std::to_string((int)code) + ' ' +
+                        cudaGetErrorName(code) + ": " +
+                        cudaGetErrorString(code));
   }
 }
 
