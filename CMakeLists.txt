@@ -91,23 +91,23 @@ list(APPEND INSTALL_TARGETS
   dnn
   )
 
-set(CONFIG_EXPORT_NAME wml-config)
-set(WML_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/wml)
-set(WML_SHARE_DIR share/wml)
+set(CONFIG_EXPORT_NAME trt-config)
+set(TRT_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/trt)
+set(TRT_SHARE_DIR share/trt)
 set(PROJECT_CONFIG ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_EXPORT_NAME}.cmake)
 
 install(TARGETS ${INSTALL_TARGETS} EXPORT ${CONFIG_EXPORT_NAME}
         LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_BINDIR}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/wml)
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/trt)
 export(TARGETS ${INSTALL_TARGETS}
-       NAMESPACE wml::
+       NAMESPACE trt::
        FILE ${PROJECT_CONFIG})
 install(EXPORT ${CONFIG_EXPORT_NAME}
-        DESTINATION "${WML_CMAKE_DIR}"
-        NAMESPACE wml::
+        DESTINATION "${TRT_CMAKE_DIR}"
+        NAMESPACE trt::
 )
-install(FILES ./cmake/FindTensorRT.cmake DESTINATION ${WML_SHARE_DIR})
+install(FILES ./cmake/FindTensorRT.cmake DESTINATION ${TRT_SHARE_DIR})
 
 
 #==============================================================================
