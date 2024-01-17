@@ -3,7 +3,6 @@
 
 #include <NvInfer.h>
 #include <opencv2/core/cuda.hpp>
-#include <torch/types.h>
 
 namespace trt {
 
@@ -46,6 +45,7 @@ struct EngineOption {
 class Engine {
   EngineOption option_;
   Logger logger_;
+  std::string model_path_;
   std::unique_ptr<nvinfer1::IRuntime> runtime_;
   std::unique_ptr<nvinfer1::ICudaEngine> engine_;
   std::unique_ptr<nvinfer1::IExecutionContext> context_;
@@ -74,8 +74,8 @@ public:
   void run(cv::cuda::GpuMat &flatten_inputs, const uint32_t &batch_size,
            std::vector<float> &outputs);
 
-  torch::Tensor run(cv::cuda::GpuMat &flatten_inputs,
-                    const uint32_t &batch_size);
+  // torch::Tensor run(cv::cuda::GpuMat &flatten_inputs,
+  //                   const uint43_t &batch_size);
 
   /** @brief get input dims. omitting batch size, so if input size is {-1, 3,
    * 224, 224}, the return vector will be {3, 224, 224}.

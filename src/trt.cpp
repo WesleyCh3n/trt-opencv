@@ -4,7 +4,7 @@
 #include <numeric> //std::accumulate
 #include <spdlog/spdlog.h>
 
-#include <torch/torch.h>
+// #include <torch/torch.h>
 
 //===================================================================================
 // TensorRT Logger
@@ -12,8 +12,14 @@
 
 void trt::Logger::log(nvinfer1::ILogger::Severity severity,
                       const char *msg) noexcept {
-  if (severity <= Severity::kWARNING) {
-    spdlog::warn(msg);
+  if (severity == Severity::kINTERNAL_ERROR) {
+    spdlog::error("TRT INTERNAL ERROR: {}", msg);
+  } else if (severity == Severity::kERROR) {
+    spdlog::error("TRT ERROR: {}", msg);
+  } else if (severity == Severity::kWARNING) {
+    spdlog::warn("TRT WARNING: {}", msg);
+  } else if (severity == Severity::kINFO) {
+    spdlog::info("TRT INFO: {}", msg);
   }
 }
 
@@ -24,6 +30,7 @@ void trt::Logger::log(nvinfer1::ILogger::Severity severity,
 trt::Engine::Engine(const std::string_view model_path,
                     const EngineOption &option)
     : option_(option) {
+  model_path_ = std::string(model_path);
   std::ifstream file(std::string(model_path), std::ios::binary | std::ios::ate);
   std::streamsize size = file.tellg();
   file.seekg(0, std::ios::beg);
@@ -138,9 +145,8 @@ void trt::Engine::run(cv::cuda::GpuMat &flatten_inputs,
   check_cuda_err(cudaStreamDestroy(stream));
 }
 
-void deleter(void *arg) { cudaFree(arg); };
-
-torch::Tensor trt::Engine::run(cv::cuda::GpuMat &flatten_inputs,
+// void deleter(void *arg) { cudaFree(arg); };
+/* torch::Tensor trt::Engine::run(cv::cuda::GpuMat &flatten_inputs,
                                const uint32_t &batch_size) {
   input_dims_.d[0] = batch_size; // Define the batch size
   context_->setInputShape(io_tensors_name_[0], input_dims_);
@@ -184,7 +190,7 @@ torch::Tensor trt::Engine::run(cv::cuda::GpuMat &flatten_inputs,
   dim.insert(dim.begin(), batch_size);
 
   return torch::from_blob(outputs, dim, deleter, torch::kCUDA);
-}
+} */
 
 std::vector<uint32_t> trt::Engine::get_input_dims() {
   auto input_dims = engine_->getTensorShape(io_tensors_name_[0]);

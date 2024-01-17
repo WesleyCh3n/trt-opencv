@@ -44,26 +44,24 @@ void parse_args(int argc, char *argv[]) {
   } catch (const cxxopts::exceptions::exception &e) {
     spdlog::error(e.what());
     spdlog::info(options.help());
-    exit(1);
+    exit(2);
   }
 }
 
 void process_single_img() {
   auto model = dnn::Yolo(global::model_path, global::max_batch_size);
-  std::vector<float> outputs;
   auto cpumat = cv::imread(global::image_path);
-  fmt::println("cols: {} rows: {}", cpumat.cols, cpumat.rows);
   auto gpumat = cv::cuda::GpuMat(cpumat);
-  std::vector<cv::cuda::GpuMat> mats;
-  for (int i = 0; i < 16; i++) {
-    mats.emplace_back(gpumat.clone());
-  }
-  auto results = model.predict(mats);
-  for (auto &r : results) {
-    std::cout << r.size() << '\n';
-    for (int i = 0; i < r.size(); i++) {
-      std::cout << r[i].rect << '\n';
-    }
+
+  auto r = model.predict(gpumat);
+  cv::Mat after;
+  gpumat.download(after);
+
+  cv::imwrite("after.jpg", after);
+
+  std::cout << r.size() << '\n';
+  for (int i = 0; i < r.size(); i++) {
+    std::cout << r[i].rect << '\n';
   }
   // auto results = model.predict(gpumat);
   // for (const auto &r : results) {

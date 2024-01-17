@@ -4,8 +4,7 @@
 #include <fmt/ranges.h>
 #include <spdlog/spdlog.h>
 
-#include "trt.hpp"
-#include "utils.hpp"
+#include "dnn.hpp"
 
 namespace global {
 std::string model_path;
@@ -47,39 +46,20 @@ void parse_args(int argc, char *argv[]) {
 }
 
 void process_single_img() {
-  trt::EngineOption model_option{.max_batch_size = global::max_batch_size};
-  trt::Engine model(global::model_path, model_option);
-  auto in_size = model.get_input_dims();
-  auto out_size = model.get_output_dims();
-  // in my case input are images with 3 channels, output are 512 feature
-  assert(in_size.size() == 3);                // CHW
-  assert(in_size[0] == 3 || in_size[0] == 1); // channel first
+  dnn::FeatureExtractor model(global::model_path, global::max_batch_size);
 
-  // read image into gpu
-  std::vector<float> outputs;
   auto cpumat = cv::imread(global::image_path);
   auto gpumat = cv::cuda::GpuMat(cpumat);
 
-  // transform image
-  auto blob = trt::utils::blob_from_gpumat(
-      gpumat,                                          // input gpumats
-      std::array<uint32_t, 2>{in_size[1], in_size[2]}, // resize
-      std::array<float, 3>{0.5, 0.5, 0.5},             // std factor
-      std::array<float, 3>{0.5, 0.5, 0.5}              // mean
-  );
+  auto r = model.predict({gpumat, gpumat});
 
-  // log some value of blob
-  cv::Mat blob_mat;
-  blob.download(blob_mat);
-  for (int i = 0; i < 10; i++) {
-    spdlog::info("blob: {} {}", i, blob_mat.at<cv::Vec3f>(i).val);
+  std::cout << r.size() << '\n';
+  for (int b = 0; b < 2; b++) {
+    for (int i = 0; i < 10; i++) {
+      std::cout << r[b * 512 + i] << ' ';
+    }
+    std::cout << std::endl;
   }
-
-  // run model inference
-  model.run(blob, 1, outputs);
-
-  // get output information
-  assert(outputs.size() == out_size[0]);
 }
 
 int main(int argc, char *argv[]) {

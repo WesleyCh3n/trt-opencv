@@ -18,12 +18,13 @@ option(BUILD_EXAMPLES "Build examples" ON)
 #==============================================================================
 # Third Party Dependencies
 #==============================================================================
-set(CAFFE2_USE_CUDNN ON)
-find_package(PythonInterp REQUIRED)
-find_package(Torch REQUIRED PATHS /opt/libtorch)
-find_package(TorchVision REQUIRED PATHS /opt/libtorchvision)
-list(APPEND TORCH_LIBRARIES libcupti.so)
+# set(CAFFE2_USE_CUDNN ON)
+# find_package(PythonInterp REQUIRED)
+# find_package(Torch REQUIRED PATHS /opt/libtorch)
+# find_package(TorchVision REQUIRED PATHS /opt/libtorchvision)
+# list(APPEND TORCH_LIBRARIES libcupti.so)
 
+find_package(CUDA REQUIRED)
 find_package(TensorRT REQUIRED)
 
 find_package(OpenMP REQUIRED)
@@ -61,13 +62,13 @@ add_library(trt
   )
 target_link_libraries(trt PUBLIC
   TensorRT::TensorRT
+  ${CUDA_LIBRARIES}
   ${OpenCV_LIBS}
-  ${TORCH_LIBRARIES}
   fmt::fmt
   spdlog::spdlog
 )
 target_include_directories(trt PUBLIC
-  ${TORCH_INCLUDE_DIRS}
+  ${CUDA_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
 )
 target_include_directories(trt PUBLIC
@@ -79,7 +80,6 @@ add_library(dnn
   src/dnn.cpp
 )
 target_link_libraries(dnn PUBLIC
-  TorchVision::TorchVision
   trt
 )
 target_include_directories(dnn PUBLIC
@@ -116,7 +116,7 @@ install(FILES ./cmake/FindTensorRT.cmake DESTINATION ${TRT_SHARE_DIR})
 if(BUILD_EXAMPLES)
   CPMAddPackage("gh:jarro2783/cxxopts@3.1.1")
   list(APPEND EXAMPLES
-    # resnet_single
+    resnet_single
     # resnet_batch
     # resnet_export_feature
     yolov8_single
