@@ -1,6 +1,7 @@
 # [**T**]ensor[**RT**] with OpenCV
 
 `libtrt`: A example wrapper for inferencing using TensorRT with OpenCV GpuMat as input.
+
 `libdnn`: Class Yolov8 and Resnet with dynamic batch size model based on `libtrt`
 to predict  OpenCV GpuMat(s).
 
