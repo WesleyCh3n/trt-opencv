@@ -32,4 +32,4 @@ sudo cmake --install build --prefix /opt/trt # use prefix to install where you w
 ```sh
 build/yolov8_single model/yolov8.trt 20231212-161000.740_00_126.jpg output.jpg
 build/resnet_single model/512-model-fp16.trt 20240114-041024.091_00_126_6_0.jpg output.jpg
-``
+```
