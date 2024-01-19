@@ -1,10 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include <opencv2/cudaarithm.hpp>  // cv::cuda::split
-#include <opencv2/cudaimgproc.hpp> // cv::cuda::cvtColor
-#include <opencv2/cudawarping.hpp> // cv::cuda::resize
-#include <opencv2/dnn.hpp>         // cv::dnn::NMSBoxes
 
 #include "trt.hpp"
 
@@ -44,7 +40,7 @@ class Yolo {
                const float &confidence_threshold_, const float &nms_threshold_);
 
 public:
-  Yolo(std::filesystem::path model_path, const uint32_t max_batch_size);
+  Yolo(std::filesystem::path model_path, const trt::EngineOption option);
 
   [[nodiscard]] std::vector<Object>
   predict(const cv::cuda::GpuMat &gmat,
@@ -65,7 +61,7 @@ class FeatureExtractor {
 
 public:
   FeatureExtractor(std::filesystem::path model_path,
-                   const uint32_t max_batch_size);
+                   const trt::EngineOption option);
   std::vector<float> predict(const cv::cuda::GpuMat &gmat,
                              const std::array<float, 3> &std = {0.5, 0.5, 0.5},
                              const std::array<float, 3> &mean = {0.5, 0.5,

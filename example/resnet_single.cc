@@ -45,8 +45,25 @@ void parse_args(int argc, char *argv[]) {
   }
 }
 
+class Logger : public nvinfer1::ILogger {
+  void log(nvinfer1::ILogger::Severity severity,
+           const char *msg) noexcept override {
+    if (severity == Severity::kINTERNAL_ERROR) {
+      spdlog::error("TRT INTERNAL ERROR: {}", msg);
+    } else if (severity == Severity::kERROR) {
+      spdlog::error("TRT ERROR: {}", msg);
+    } else if (severity == Severity::kWARNING) {
+      spdlog::warn("TRT WARNING: {}", msg);
+    } else if (severity == Severity::kINFO) {
+      spdlog::info("TRT INFO: {}", msg);
+    }
+  }
+};
+
 void process_single_img() {
-  dnn::FeatureExtractor model(global::model_path, global::max_batch_size);
+  Logger logger;
+  trt::EngineOption options{global::max_batch_size, logger};
+  dnn::FeatureExtractor model(global::model_path, options);
 
   auto cpumat = cv::imread(global::image_path);
   auto gpumat = cv::cuda::GpuMat(cpumat);

@@ -2,24 +2,6 @@
 
 #include <fstream>
 #include <numeric> //std::accumulate
-#include <spdlog/spdlog.h>
-
-//===================================================================================
-// TensorRT Logger
-//===================================================================================
-
-void trt::Logger::log(nvinfer1::ILogger::Severity severity,
-                      const char *msg) noexcept {
-  if (severity == Severity::kINTERNAL_ERROR) {
-    spdlog::error("TRT INTERNAL ERROR: {}", msg);
-  } else if (severity == Severity::kERROR) {
-    spdlog::error("TRT ERROR: {}", msg);
-  } else if (severity == Severity::kWARNING) {
-    spdlog::warn("TRT WARNING: {}", msg);
-  } else if (severity == Severity::kINFO) {
-    spdlog::info("TRT INFO: {}", msg);
-  }
-}
 
 //===================================================================================
 // Engine
@@ -39,7 +21,7 @@ trt::Engine::Engine(const std::string_view model_path,
   }
 
   runtime_ = std::unique_ptr<nvinfer1::IRuntime>(
-      nvinfer1::createInferRuntime(logger_));
+      nvinfer1::createInferRuntime(option_.logger));
   if (runtime_ == nullptr) {
     throw EngineException("Failed to create runtime");
   }
@@ -55,27 +37,28 @@ trt::Engine::Engine(const std::string_view model_path,
   }
 
   int32_t num_io_tensors = engine_->getNbIOTensors();
-  spdlog::trace("number of IO tensors: {}", num_io_tensors);
   io_tensors_buf_.resize(num_io_tensors);
   io_tensors_name_.resize(num_io_tensors);
 
   cudaStream_t stream;
   check_cuda_err(cudaStreamCreate(&stream));
 
+  option_.logger.log(
+      nvinfer1::ILogger::Severity::kINFO,
+      ("Number of IO tensors: " + std::to_string(num_io_tensors)).c_str());
+  option_.logger.log(
+      nvinfer1::ILogger::Severity::kINFO,
+      ("Max batch size: " + std::to_string(option_.max_batch_size)).c_str());
+
   for (int i = 0; i < engine_->getNbIOTensors(); i++) {
     const char *tensor_name = engine_->getIOTensorName(i);
     io_tensors_name_[i] = tensor_name;
     const auto tensor_shape = engine_->getTensorShape(tensor_name);
     const auto tensor_type = engine_->getTensorIOMode(tensor_name);
-    spdlog::trace("idx: {}, name: {}", i, tensor_name);
-    for (int i = 0; i < tensor_shape.nbDims; i++) {
-      spdlog::trace("        shape[{}]: {}", i, tensor_shape.d[i]);
-    }
-    spdlog::trace("max batch size: {}", option_.max_batch_size);
+
     const auto tensor_max_bytes = std::accumulate(
         tensor_shape.d + 1, tensor_shape.d + tensor_shape.nbDims,
         sizeof(float) * option_.max_batch_size, std::multiplies<uint64_t>());
-    spdlog::trace("tensor max bytes: {}", tensor_max_bytes);
 
     if (tensor_type == nvinfer1::TensorIOMode::kINPUT) {
       input_dims_ = tensor_shape;
@@ -91,7 +74,30 @@ trt::Engine::Engine(const std::string_view model_path,
     } else {
       throw EngineException("Unsupported tensor type");
     }
+
+    // log the basic information
+    std::string tensor_type_str =
+        tensor_type == nvinfer1::TensorIOMode::kINPUT ? "INPUT" : "OUTPUT";
+    std::string dim_str;
+    dim_str += '[';
+    for (int n_i = 0; n_i < tensor_shape.nbDims; n_i++) {
+      dim_str += std::to_string(tensor_shape.d[n_i]);
+      if (n_i < tensor_shape.nbDims - 1) {
+        dim_str += ", ";
+      }
+    }
+    dim_str += ']';
+    option_.logger.log(nvinfer1::ILogger::Severity::kINFO,
+                       ("Tensor idx: " + std::to_string(i) +
+                        ", name: " + tensor_name + ", type: " + tensor_type_str)
+                           .c_str());
+    option_.logger.log(nvinfer1::ILogger::Severity::kINFO,
+                       ("    Dimensions: " + dim_str).c_str());
+    option_.logger.log(
+        nvinfer1::ILogger::Severity::kINFO,
+        ("    Max bytes: " + std::to_string(tensor_max_bytes)).c_str());
   }
+
   // Synchronize and destroy the cuda stream
   check_cuda_err(cudaStreamSynchronize(stream));
   check_cuda_err(cudaStreamDestroy(stream));

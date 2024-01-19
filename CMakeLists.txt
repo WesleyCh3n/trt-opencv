@@ -30,7 +30,7 @@ if(BUILD_FMT)
     NAME fmt
     GIT_TAG 10.1.1
     GITHUB_REPOSITORY fmtlib/fmt
-    OPTIONS "FMT_INSTALL YES"
+    OPTIONS "FMT_INSTALL NO"
   )
 else()
   find_package(fmt REQUIRED)
@@ -41,7 +41,7 @@ if(BUILD_SPDLOG)
     GIT_TAG v1.12.0
     GITHUB_REPOSITORY gabime/spdlog
     OPTIONS "SPDLOG_FMT_EXTERNAL YES"
-    "SPDLOG_INSTALL YES"
+    "SPDLOG_INSTALL NO"
   )
 else()
   find_package(spdlog REQUIRED)
@@ -58,8 +58,6 @@ target_link_libraries(trt PUBLIC
   TensorRT::TensorRT
   ${CUDA_LIBRARIES}
   ${OpenCV_LIBS}
-  fmt::fmt
-  spdlog::spdlog
 )
 target_include_directories(trt PUBLIC
   ${CUDA_INCLUDE_DIRS}
@@ -124,6 +122,8 @@ if(BUILD_EXAMPLES)
       )
     target_link_libraries(${example} PRIVATE
       dnn
+      fmt::fmt
+      spdlog::spdlog
       OpenMP::OpenMP_CXX
       cxxopts)
     target_include_directories(${example} PRIVATE

@@ -70,8 +70,26 @@ std::vector<cv::Mat> get_images_mat(std::vector<std::string> &image_paths) {
   return images;
 }
 
+class Logger : public nvinfer1::ILogger {
+  void log(nvinfer1::ILogger::Severity severity,
+           const char *msg) noexcept override {
+    if (severity == Severity::kINTERNAL_ERROR) {
+      spdlog::error("TRT INTERNAL ERROR: {}", msg);
+    } else if (severity == Severity::kERROR) {
+      spdlog::error("TRT ERROR: {}", msg);
+    } else if (severity == Severity::kWARNING) {
+      spdlog::warn("TRT WARNING: {}", msg);
+    } else if (severity == Severity::kINFO) {
+      spdlog::info("TRT INFO: {}", msg);
+    }
+  }
+};
+
 void process_batch_img() {
-  auto model = dnn::Yolo(global::model_path, global::max_batch_size);
+  Logger logger;
+  trt::EngineOption options{global::max_batch_size, logger};
+
+  auto model = dnn::Yolo(global::model_path, options);
   auto images_paths = get_images_path(global::dir_path);
   auto cpu_images = get_images_mat(images_paths);
 

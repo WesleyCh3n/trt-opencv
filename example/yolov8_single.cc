@@ -48,8 +48,26 @@ void parse_args(int argc, char *argv[]) {
   }
 }
 
+class Logger : public nvinfer1::ILogger {
+  void log(nvinfer1::ILogger::Severity severity,
+           const char *msg) noexcept override {
+    if (severity == Severity::kINTERNAL_ERROR) {
+      spdlog::error("TRT INTERNAL ERROR: {}", msg);
+    } else if (severity == Severity::kERROR) {
+      spdlog::error("TRT ERROR: {}", msg);
+    } else if (severity == Severity::kWARNING) {
+      spdlog::warn("TRT WARNING: {}", msg);
+    } else if (severity == Severity::kINFO) {
+      spdlog::info("TRT INFO: {}", msg);
+    }
+  }
+};
+
 void process_single_img() {
-  auto model = dnn::Yolo(global::model_path, global::max_batch_size);
+  Logger logger;
+  trt::EngineOption options{global::max_batch_size, logger};
+
+  auto model = dnn::Yolo(global::model_path, options);
   auto cpumat = cv::imread(global::image_path);
   auto gpumat = cv::cuda::GpuMat(cpumat);
 
@@ -60,10 +78,10 @@ void process_single_img() {
   }
   auto rs = model.predict(inputs);
   for (const auto &r : rs) {
-    fmt::println("=== {}", r.size());
+    // fmt::println("=== {}", r.size());
     for (const auto &b : r) {
-      fmt::println("{} {} {} {}", b.rect.x, b.rect.y, b.rect.width,
-                   b.rect.height);
+      // fmt::println("{} {} {} {}", b.rect.x, b.rect.y, b.rect.width,
+      //              b.rect.height);
     }
   }
 

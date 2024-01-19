@@ -1,5 +1,10 @@
 #include "dnn.hpp"
 
+#include <opencv2/cudaarithm.hpp>  // cv::cuda::split
+#include <opencv2/cudaimgproc.hpp> // cv::cuda::cvtColor
+#include <opencv2/cudawarping.hpp> // cv::cuda::resize
+#include <opencv2/dnn.hpp>         // cv::dnn::NMSBoxes
+
 void dnn::letterbox(const cv::cuda::GpuMat &input,
                     cv::cuda::GpuMat &output_image,
                     const cv::Size &target_size) {
@@ -85,8 +90,7 @@ dnn::blob_from_gpumat(const std::vector<cv::cuda::GpuMat> &inputs,
 }
 
 dnn::Yolo::Yolo(std::filesystem::path model_path,
-                const uint32_t max_batch_size) {
-  auto option = trt::EngineOption{max_batch_size};
+                const trt::EngineOption option) {
   model_ = std::make_unique<trt::Engine>(model_path.string(), option);
   input_dim_ = model_->get_input_dims();
   output_dim_ = model_->get_output_dims();
@@ -190,8 +194,7 @@ std::vector<std::vector<dnn::Object>> dnn::Yolo::post_process(
 // =============================================================================
 
 dnn::FeatureExtractor::FeatureExtractor(std::filesystem::path model_path,
-                                        const uint32_t max_batch_size) {
-  auto option = trt::EngineOption{max_batch_size};
+                                        const trt::EngineOption option) {
   model_ = std::make_unique<trt::Engine>(model_path.string(), option);
   input_dim_ = model_->get_input_dims();
   output_dim_ = model_->get_output_dims();

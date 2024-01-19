@@ -31,20 +31,15 @@ public:
   char const *what() const noexcept override { return msg_.c_str(); }
 };
 
-/** @brief trt logger */
-class Logger : public nvinfer1::ILogger {
-  void log(nvinfer1::ILogger::Severity severity,
-           const char *msg) noexcept override;
-};
-
 /** @brief engine option */
 struct EngineOption {
   uint32_t max_batch_size;
+  nvinfer1::ILogger &logger;
 };
 
 class Engine {
-  EngineOption option_;
-  Logger logger_;
+  const EngineOption &option_;
+  // Logger logger_;
   std::string model_path_;
   std::unique_ptr<nvinfer1::IRuntime> runtime_;
   std::unique_ptr<nvinfer1::ICudaEngine> engine_;
