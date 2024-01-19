@@ -43,16 +43,9 @@ public:
    * @brief get the lap time since last start_time_
    * @return the lap time in nanoseconds
    * */
-  long lap_time() {
-    long end = std::chrono::time_point_cast<std::chrono::microseconds>(
-                   std::chrono::high_resolution_clock::now())
-                   .time_since_epoch()
-                   .count();
-    long start =
-        std::chrono::time_point_cast<std::chrono::microseconds>(start_time_)
-            .time_since_epoch()
-            .count();
-    return end - start; // nanoseconds
+  std::chrono::nanoseconds lap_time() {
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::high_resolution_clock::now() - start_time_); // nanoseconds
   };
 
 private:

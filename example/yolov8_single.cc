@@ -53,21 +53,33 @@ void process_single_img() {
   auto cpumat = cv::imread(global::image_path);
   auto gpumat = cv::cuda::GpuMat(cpumat);
 
-  auto r = model.predict(gpumat);
-  cv::Mat after;
-  gpumat.download(after);
-
-  cv::imwrite("after.jpg", after);
-
-  std::cout << r.size() << '\n';
-  for (int i = 0; i < r.size(); i++) {
-    std::cout << r[i].rect << '\n';
+  // test multiple inputs
+  std::vector<cv::cuda::GpuMat> inputs;
+  for (int i = 0; i < global::max_batch_size; i++) {
+    inputs.emplace_back(gpumat.clone());
   }
-  // auto results = model.predict(gpumat);
-  // for (const auto &r : results) {
-  //   cv::rectangle(cpumat, r.rect, cv::Scalar(0, 255, 0), 2);
-  // }
-  // cv::imwrite(global::output_image_path, cpumat);
+  auto rs = model.predict(inputs);
+  for (const auto &r : rs) {
+    fmt::println("=== {}", r.size());
+    for (const auto &b : r) {
+      fmt::println("{} {} {} {}", b.rect.x, b.rect.y, b.rect.width,
+                   b.rect.height);
+    }
+  }
+
+  cv::Mat larger_mat;
+  cv::resize(cpumat, larger_mat, cv::Size(2048, 1556));
+  auto results = model.predict({gpumat, cv::cuda::GpuMat(larger_mat)});
+
+  std::vector<cv::Mat> mats{cpumat, larger_mat};
+  int i = 0;
+  for (const auto &result : results) {
+    for (const auto &r : result) {
+      cv::rectangle(mats[i], r.rect, cv::Scalar(0, 255, 0), 2);
+    }
+    cv::imwrite(fmt::format("{}-size.jpg", i), mats[i]);
+    i++;
+  }
 }
 
 int main(int argc, char *argv[]) {

@@ -18,12 +18,6 @@ option(BUILD_EXAMPLES "Build examples" ON)
 #==============================================================================
 # Third Party Dependencies
 #==============================================================================
-# set(CAFFE2_USE_CUDNN ON)
-# find_package(PythonInterp REQUIRED)
-# find_package(Torch REQUIRED PATHS /opt/libtorch)
-# find_package(TorchVision REQUIRED PATHS /opt/libtorchvision)
-# list(APPEND TORCH_LIBRARIES libcupti.so)
-
 find_package(CUDA REQUIRED)
 find_package(TensorRT REQUIRED)
 

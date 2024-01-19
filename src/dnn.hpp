@@ -11,7 +11,7 @@
 namespace dnn {
 
 void letterbox(const cv::cuda::GpuMat &input, cv::cuda::GpuMat &output_image,
-               const cv::Size &new_size, const cv::Size &target_size);
+               const cv::Size &target_size);
 cv::cuda::GpuMat blob_from_gpumat(const cv::cuda::GpuMat &input,
                                   const std::array<float, 3> &std,
                                   const std::array<float, 3> &mean, bool swapBR,
@@ -35,26 +35,23 @@ class Yolo {
   std::vector<std::vector<int>> idxes_;
 
   std::vector<Object> post_process(float *raw_results,
+                                   const cv::cuda::GpuMat &input,
                                    const float &confidence_threshold_,
-                                   const float &nms_threshold_,
-                                   const float &scale, const cv::Size &pad,
-                                   const uint32_t img_cols,
-                                   const uint32_t img_rows);
+                                   const float &nms_threshold_);
 
   std::vector<std::vector<Object>>
-  post_process(float *raw_results, const uint32_t batch_size,
-               const float &confidence_threshold_, const float &nms_threshold_,
-               const float &scale, const cv::Size &pad, const uint32_t img_cols,
-               const uint32_t img_rows);
+  post_process(float *raw_results, const std::vector<cv::cuda::GpuMat> &inputs,
+               const float &confidence_threshold_, const float &nms_threshold_);
 
 public:
   Yolo(std::filesystem::path model_path, const uint32_t max_batch_size);
 
-  std::vector<Object> predict(const cv::cuda::GpuMat &gmat,
-                              const float &confidence_threshold = 0.25,
-                              const float &nms_threshold = 0.45);
+  [[nodiscard]] std::vector<Object>
+  predict(const cv::cuda::GpuMat &gmat,
+          const float &confidence_threshold = 0.25,
+          const float &nms_threshold = 0.45);
 
-  std::vector<std::vector<Object>>
+  [[nodiscard]] std::vector<std::vector<Object>>
   predict(const std::vector<cv::cuda::GpuMat> &gmats,
           const float &confidence_threshold = 0.25,
           const float &nms_threshold = 0.45);
