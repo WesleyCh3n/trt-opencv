@@ -1,11 +1,5 @@
 #include "dnn.hpp"
 
-// #include <torchvision/ops/nms.h>
-// #include <torchvision/vision.h>
-//
-// using torch::indexing::None;
-// using torch::indexing::Slice;
-
 void dnn::letterbox(const cv::cuda::GpuMat &input,
                     cv::cuda::GpuMat &output_image, const cv::Size &new_size,
                     const cv::Size &target_size) {
@@ -207,57 +201,6 @@ dnn::Yolo::post_process(float *raw_results, const uint32_t batch_size,
   }
   return results;
 };
-
-// =============================================================================
-// libtorch post_process
-// =============================================================================
-/* torch::Tensor bxywh2bxyxy(const torch::Tensor &x, const cv::Size &padding,
-                          const float &scale) {
-  assert(x.device() == torch::kCUDA);
-  auto y = torch::empty_like(x, torch::kCUDA);
-  auto dw = x.index({Slice(), 2, Slice()}).div(2);
-  auto dh = x.index({Slice(), 3, Slice()}).div(2);
-  y.index_put_({Slice(), 0, Slice()}, x.index({Slice(), 0, Slice()}) - dw);
-  y.index_put_({Slice(), 1, Slice()}, x.index({Slice(), 1, Slice()}) - dh);
-  y.index_put_({Slice(), 2, Slice()}, x.index({Slice(), 0, Slice()}) + dw);
-  y.index_put_({Slice(), 3, Slice()}, x.index({Slice(), 1, Slice()}) + dh);
-  y.index_put_({Slice(), torch::tensor({0, 2}), Slice()},
-               y.index({Slice(), torch::tensor({0, 2}), Slice()}) -
-                   padding.width);
-  y.index_put_({Slice(), torch::tensor({1, 3}), Slice()},
-               y.index({Slice(), torch::tensor({1, 3}), Slice()}) -
-                   padding.height);
-  y.index_put_({Slice(), Slice(None, 4), Slice()},
-               y.index({Slice(), Slice(None, 4), Slice()}) / scale);
-  return y;
-}
-
-std::vector<std::vector<dnn::Object>> dnn::Yolo::post_process(
-    torch::Tensor &outputs, const float &confidence_threshold_,
-    const float &nms_threshold_, const float &scale, const cv::Size &pad) {
-  outputs.index_put_(
-      {Slice(), Slice(0, 4)},
-      bxywh2bxyxy(outputs.index({Slice(), Slice(0, 4)}), pad, scale));
-  auto scores =
-      (outputs.index({Slice(), Slice(4, 5)}).amax(1) > confidence_threshold_);
-  outputs = outputs.transpose(-1, -2);
-  std::vector<std::vector<Object>> results(outputs.size(0));
-  for (int xi = 0; xi < outputs.size(0); xi++) {
-    auto b = outputs.index({xi}).index({scores[xi]});
-    auto bi = vision::ops::nms(b.index({"...", Slice(None, 4)}),
-                               b.index({"...", 4}), nms_threshold_);
-    auto r = b.index({bi}).cpu();
-    for (int ri = 0; ri < r.size(0); ri++) {
-      results[xi].emplace_back(
-          Object{cv::Rect{cv::Point{(int)r[ri][0].item().toFloat(),
-                                    (int)r[ri][1].item().toFloat()},
-                          cv::Point{(int)r[ri][2].item().toFloat(),
-                                    (int)r[ri][3].item().toFloat()}},
-                 r[ri][4].item().toFloat()});
-    }
-  }
-  return results;
-} */
 
 // =============================================================================
 // FeatureExtractor

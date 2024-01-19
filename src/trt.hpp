@@ -74,9 +74,6 @@ public:
   void run(cv::cuda::GpuMat &flatten_inputs, const uint32_t &batch_size,
            std::vector<float> &outputs);
 
-  // torch::Tensor run(cv::cuda::GpuMat &flatten_inputs,
-  //                   const uint43_t &batch_size);
-
   /** @brief get input dims. omitting batch size, so if input size is {-1, 3,
    * 224, 224}, the return vector will be {3, 224, 224}.
    * @return vector of dimension
