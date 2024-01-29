@@ -39,6 +39,18 @@ class Yolo {
   post_process(float *raw_results, const std::vector<cv::cuda::GpuMat> &inputs,
                const float &confidence_threshold_, const float &nms_threshold_);
 
+  void post_process(float *raw_results, const cv::cuda::GpuMat &input,
+                    const float &confidence_threshold_,
+                    const float &nms_threshold_, std::vector<cv::Rect> &rects,
+                    std::vector<float> &confs);
+
+  void post_process(float *raw_results,
+                    const std::vector<cv::cuda::GpuMat> &inputs,
+                    const float &confidence_threshold_,
+                    const float &nms_threshold_,
+                    std::vector<std::vector<cv::Rect>> &rects,
+                    std::vector<std::vector<float>> &confs);
+
 public:
   Yolo(std::filesystem::path model_path, const trt::EngineOption option);
 
@@ -51,6 +63,12 @@ public:
   predict(const std::vector<cv::cuda::GpuMat> &gmats,
           const float &confidence_threshold = 0.25,
           const float &nms_threshold = 0.45);
+
+  void predict(const std::vector<cv::cuda::GpuMat> &gmats,
+               std::vector<std::vector<cv::Rect>> &rects,
+               std::vector<std::vector<float>> &confs,
+               const float &confidence_threshold = 0.25,
+               const float &nms_threshold = 0.45);
 };
 
 class FeatureExtractor {

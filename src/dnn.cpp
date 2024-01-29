@@ -5,6 +5,9 @@
 #include <opencv2/cudawarping.hpp> // cv::cuda::resize
 #include <opencv2/dnn.hpp>         // cv::dnn::NMSBoxes
 
+// =============================================================================
+// Utility functions
+// =============================================================================
 void dnn::letterbox(const cv::cuda::GpuMat &input,
                     cv::cuda::GpuMat &output_image,
                     const cv::Size &target_size) {
@@ -89,6 +92,9 @@ dnn::blob_from_gpumat(const std::vector<cv::cuda::GpuMat> &inputs,
   return blob;
 }
 
+// =============================================================================
+// Yolo Class
+// =============================================================================
 dnn::Yolo::Yolo(std::filesystem::path model_path,
                 const trt::EngineOption option) {
   model_ = std::make_unique<trt::Engine>(model_path.string(), option);
@@ -130,6 +136,91 @@ dnn::Yolo::predict(const std::vector<cv::cuda::GpuMat> &gmats,
   model_->run(blob, batch_size, raw_output_);
   return post_process(raw_output_.data(), gmats, confidence_threshold,
                       nms_threshold);
+}
+
+void dnn::Yolo::predict(const std::vector<cv::cuda::GpuMat> &gmats,
+                        std::vector<std::vector<cv::Rect>> &rects,
+                        std::vector<std::vector<float>> &confs,
+                        const float &confidence_threshold,
+                        const float &nms_threshold) {
+  uint32_t batch_size = gmats.size();
+  std::vector<cv::cuda::GpuMat> inputs(batch_size);
+  for (int i = 0; i < gmats.size(); i++) {
+    letterbox(
+        gmats[i], inputs[i],
+        {static_cast<int>(input_dim_[2]), static_cast<int>(input_dim_[1])});
+  }
+  auto blob = blob_from_gpumat(inputs,                        // input gpumats
+                               std::array<float, 3>{1, 1, 1}, // std factor
+                               std::array<float, 3>{0, 0, 0}, // mean
+                               true, true);
+  model_->run(blob, batch_size, raw_output_);
+  rects.clear();
+  confs.clear();
+  post_process(raw_output_.data(), gmats, confidence_threshold, nms_threshold,
+               rects, confs);
+}
+
+void dnn::Yolo::post_process(float *raw_results, const cv::cuda::GpuMat &input,
+                             const float &confidence_threshold_,
+                             const float &nms_threshold_,
+                             std::vector<cv::Rect> &rects,
+                             std::vector<float> &confs) {
+
+  if (output_dim_[0] >= 6) {
+    throw std::runtime_error("xywhsc is not supported yet");
+  }
+  const float scale = std::min((float)input_dim_[2] / input.cols,
+                               (float)input_dim_[1] / input.rows);
+  const float padw = (std::round(input_dim_[2] - input.cols * scale) / 2 - 0.1);
+  const float padh = (std::round(input_dim_[1] - input.rows * scale) / 2 - 0.1);
+  std::vector<cv::Rect> rects_all;
+  std::vector<float> confs_all;
+  std::vector<int> idxes;
+  for (int i = 0; i < output_dim_[1]; i++) {
+    if (raw_results[4 * output_dim_[1] + i] > confidence_threshold_) {
+      float xc = raw_results[i];
+      float yc = raw_results[1 * output_dim_[1] + i];
+      float dw = raw_results[2 * output_dim_[1] + i] / 2;
+      float dh = raw_results[3 * output_dim_[1] + i] / 2;
+      float x1 = xc - dw;
+      float y1 = yc - dh;
+      float x2 = xc + dw;
+      float y2 = yc + dh;
+
+      x1 = std::max((x1 - padw) / scale, (float)0.0);
+      y1 = std::max((y1 - padh) / scale, (float)0.0);
+      x2 = std::min((x2 - padw) / scale, (float)input.size().width);
+      y2 = std::min((y2 - padh) / scale, (float)input.size().height);
+
+      rects_all.emplace_back(
+          cv::Rect(cv::Point(std::round(x1), std::round(y1)),
+                   cv::Point(std::round(x2), std::round(y2))));
+      confs_all.emplace_back(raw_results[4 * output_dim_[1] + i]);
+    }
+  }
+  if (!rects_all.empty()) {
+    cv::dnn::NMSBoxes(rects_all, confs_all, confidence_threshold_,
+                      nms_threshold_, idxes);
+  }
+  for (auto &i : idxes) {
+    rects.emplace_back(rects_all[i]);
+    confs.emplace_back(confs_all[i]);
+  }
+}
+
+void dnn::Yolo::post_process(float *raw_results,
+                             const std::vector<cv::cuda::GpuMat> &inputs,
+                             const float &confidence_threshold_,
+                             const float &nms_threshold_,
+                             std::vector<std::vector<cv::Rect>> &rects,
+                             std::vector<std::vector<float>> &confs) {
+  rects.resize(inputs.size());
+  confs.resize(inputs.size());
+  for (int b = 0; b < inputs.size(); b++) {
+    post_process(raw_results + b * output_dim_[0] * output_dim_[1], inputs[b],
+                 0.25, 0.45, rects[b], confs[b]);
+  }
 }
 
 std::vector<dnn::Object>

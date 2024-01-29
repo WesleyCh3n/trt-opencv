@@ -2,6 +2,7 @@
 
 #include <cxxopts.hpp>
 #include <spdlog/spdlog.h>
+#include <vector>
 
 #include "dnn.hpp"
 #include "trt.hpp"
@@ -76,24 +77,34 @@ void process_single_img() {
   for (int i = 0; i < global::max_batch_size; i++) {
     inputs.emplace_back(gpumat.clone());
   }
-  auto rs = model.predict(inputs);
-  for (const auto &r : rs) {
+  std::vector<std::vector<cv::Rect>> rects;
+  std::vector<std::vector<float>> confs;
+  model.predict(inputs, rects, confs);
+  for (const auto &rect : rects) {
+    fmt::println("=== {}", rect.size());
+    for (const auto &r : rect) {
+      fmt::println("{} {} {} {}", r.x, r.y, r.width, r.height);
+    }
+  }
+
+  /* for (const auto &r : rs) {
     // fmt::println("=== {}", r.size());
     for (const auto &b : r) {
       // fmt::println("{} {} {} {}", b.rect.x, b.rect.y, b.rect.width,
       //              b.rect.height);
     }
-  }
+  } */
 
   cv::Mat larger_mat;
   cv::resize(cpumat, larger_mat, cv::Size(2048, 1556));
-  auto results = model.predict({gpumat, cv::cuda::GpuMat(larger_mat)});
+  // auto results = model.predict({gpumat, cv::cuda::GpuMat(larger_mat)});
+  model.predict({gpumat, cv::cuda::GpuMat(larger_mat)}, rects, confs);
 
   std::vector<cv::Mat> mats{cpumat, larger_mat};
   int i = 0;
-  for (const auto &result : results) {
-    for (const auto &r : result) {
-      cv::rectangle(mats[i], r.rect, cv::Scalar(0, 255, 0), 2);
+  for (const auto &rect : rects) {
+    for (const auto &r : rect) {
+      cv::rectangle(mats[i], r, cv::Scalar(0, 255, 0), 2);
     }
     cv::imwrite(fmt::format("{}-size.jpg", i), mats[i]);
     i++;
