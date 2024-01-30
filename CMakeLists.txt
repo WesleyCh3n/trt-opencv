@@ -43,14 +43,16 @@ set_target_properties(trt PROPERTIES PUBLIC_HEADER "src/trt.hpp")
 
 add_library(dnn
   src/dnn.cpp
+  src/dist.cu
 )
 target_link_libraries(dnn PUBLIC
   trt
 )
+set(DNN_HEADERS "src/dnn.hpp" "src/dist.cuh")
 target_include_directories(dnn PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-set_target_properties(dnn PROPERTIES PUBLIC_HEADER "src/dnn.hpp")
+set_target_properties(dnn PROPERTIES PUBLIC_HEADER "${DNN_HEADERS}")
 
 include(CMakePackageConfigHelpers)
 list(APPEND INSTALL_TARGETS
@@ -122,5 +124,17 @@ if(BUILD_EXAMPLES)
       ${CMAKE_CURRENT_SOURCE_DIR}/include
       )
   endforeach()
+
+  add_executable(dist
+    example/cuda/distance.cu
+  )
+  target_link_libraries(dist PRIVATE
+    fmt::fmt
+    dnn
+  )
+  target_include_directories(dist PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+  )
 
 endif()
