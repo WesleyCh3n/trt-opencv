@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "trt"
+version = "0.1.0"
+description = ""
+authors = ["WesleyCh3n <wesley.ch3n.0530@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+opencv-python-headless = "^4.9.0.80"
+cuda-python = "^12.3.0"
+tensorrt = {version = "^8.6.1.post1", source = "trt"}
+tensorrt-libs = {version = "^8.6.1", source = "trt"}
+tensorrt-bindings = {version = "^8.6.1", source = "trt"}
+tqdm = "^4.66.2"
+
+
+[[tool.poetry.source]]
+name = "trt"
+url = "https://pypi.nvidia.com"
+priority = "explicit"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

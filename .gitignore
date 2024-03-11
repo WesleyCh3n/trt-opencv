@@ -1,6 +1,7 @@
 .cache
 build
-model
+model/*
+python/dist/*
 out
 *.tsv
 *.jpg
