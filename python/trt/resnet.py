@@ -14,6 +14,9 @@ class R50Model:
         self.model = TensorRTInfer(model_path, batch_size)
         self.gray = gray
 
+    def __del__(self):
+        del self.model
+
     def __call__(self, imgs: list) -> np.ndarray:
         blobs = np.zeros((len(imgs), 3, 112, 112), dtype=np.float32)
 
