@@ -9,9 +9,10 @@ from trt.utils import batch
 
 
 class R50Model:
-    def __init__(self, model_path: str, batch_size: int):
+    def __init__(self, model_path: str, batch_size: int, gray: bool = False):
         self.bs = batch_size
         self.model = TensorRTInfer(model_path, batch_size)
+        self.gray = gray
 
     def __call__(self, imgs: list) -> np.ndarray:
         blobs = np.zeros((len(imgs), 3, 112, 112), dtype=np.float32)
@@ -33,7 +34,13 @@ class R50Model:
 
     def preprocess(self, image_path: str, index: int):
         img = cv2.imread(image_path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        if self.gray:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            # img = cv2.merge([img, img, img])
+            img = np.expand_dims(img, axis=2)
+            img = np.repeat(img, 3, axis=2)
+        else:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, (112, 112), interpolation=cv2.INTER_AREA)
         img = img.astype(np.float32) / 255.0  # transform.ToTensor()
         img = (img - 0.5) / 0.5
