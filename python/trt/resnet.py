@@ -9,22 +9,23 @@ from trt.utils import batch
 
 
 class R50Model:
-    def __init__(self, model_path: str, batch_size: int, gray: bool = False):
+    def __init__(self, model_path: str, batch_size: int):
         self.bs = batch_size
         self.model = TensorRTInfer(model_path, batch_size)
-        self.gray = gray
 
     def __del__(self):
         del self.model
 
-    def __call__(self, imgs: list) -> np.ndarray:
+    def __call__(self, imgs: list, gray: bool = False) -> np.ndarray:
         blobs = np.zeros((len(imgs), 3, 112, 112), dtype=np.float32)
 
         num_workers = os.cpu_count()
         if num_workers is None:
             raise RuntimeError("Unable to determine number of CPU cores")
         executor = ThreadPoolExecutor(int(num_workers / 2))
-        jobs = [executor.submit(self.preprocess, img, i) for i, img in enumerate(imgs)]
+        jobs = [
+            executor.submit(self.preprocess, img, gray, i) for i, img in enumerate(imgs)
+        ]
         for job in as_completed(jobs):
             blob, i = job.result()
             blobs[i] = blob
@@ -35,9 +36,9 @@ class R50Model:
 
         return result
 
-    def preprocess(self, image_path: str, index: int):
+    def preprocess(self, image_path: str, gray: bool, index: int):
         img = cv2.imread(image_path)
-        if self.gray:
+        if gray:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             # img = cv2.merge([img, img, img])
             img = np.expand_dims(img, axis=2)
