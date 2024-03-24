@@ -11,11 +11,11 @@ void letterbox(const cv::cuda::GpuMat &input, cv::cuda::GpuMat &output_image,
 cv::cuda::GpuMat blob_from_gpumat(const cv::cuda::GpuMat &input,
                                   const std::array<float, 3> &std,
                                   const std::array<float, 3> &mean, bool swapBR,
-                                  bool normalize);
+                                  bool normalize, bool grayscale = false);
 cv::cuda::GpuMat blob_from_gpumat(const std::vector<cv::cuda::GpuMat> &inputs,
                                   const std::array<float, 3> &std,
                                   const std::array<float, 3> &mean, bool swapBR,
-                                  bool normalize);
+                                  bool normalize, bool grayscale = false);
 
 struct Object {
   cv::Rect rect;
@@ -80,14 +80,16 @@ class FeatureExtractor {
 public:
   FeatureExtractor(std::filesystem::path model_path,
                    const trt::EngineOption option);
-  std::vector<float> predict(const cv::cuda::GpuMat &gmat,
+  std::vector<float> predict(const cv::cuda::GpuMat &gmat, bool swapBR = true,
+                             bool normalize = true, bool grayscale = false,
                              const std::array<float, 3> &std = {0.5, 0.5, 0.5},
                              const std::array<float, 3> &mean = {0.5, 0.5,
                                                                  0.5});
-  std::vector<float> predict(const std::vector<cv::cuda::GpuMat> &gmat,
-                             const std::array<float, 3> &std = {0.5, 0.5, 0.5},
-                             const std::array<float, 3> &mean = {0.5, 0.5,
-                                                                 0.5});
+  std::vector<float>
+  predict(const std::vector<cv::cuda::GpuMat> &gmat, bool swapBR = true,
+          bool normalize = true, bool grayscale = false,
+          const std::array<float, 3> &std = {0.5, 0.5, 0.5},
+          const std::array<float, 3> &mean = {0.5, 0.5, 0.5});
 };
 
 } // namespace dnn

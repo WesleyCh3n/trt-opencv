@@ -30,9 +30,20 @@ void dnn::letterbox(const cv::cuda::GpuMat &input,
 cv::cuda::GpuMat dnn::blob_from_gpumat(const cv::cuda::GpuMat &input,
                                        const std::array<float, 3> &std,
                                        const std::array<float, 3> &mean,
-                                       bool swapBR, bool normalize) {
+                                       bool swapBR, bool normalize,
+                                       bool grayscale) {
   if (swapBR)
     cv::cuda::cvtColor(input, input, cv::COLOR_BGR2RGB);
+  if (grayscale) {
+    cv::cuda::GpuMat gray;
+    if (swapBR) {
+      cv::cuda::cvtColor(input, gray, cv::COLOR_RGB2GRAY);
+      cv::cuda::cvtColor(gray, input, cv::COLOR_GRAY2RGB);
+    } else {
+      cv::cuda::cvtColor(input, gray, cv::COLOR_BGR2GRAY);
+      cv::cuda::cvtColor(gray, input, cv::COLOR_GRAY2BGR);
+    }
+  }
   cv::cuda::GpuMat blob(1, input.rows * input.cols, CV_8UC3);
   size_t continuous_length = input.rows * input.cols;
   std::vector<cv::cuda::GpuMat> rgb{
@@ -58,10 +69,19 @@ cv::cuda::GpuMat
 dnn::blob_from_gpumat(const std::vector<cv::cuda::GpuMat> &inputs,
                       const std::array<float, 3> &std,
                       const std::array<float, 3> &mean, bool swapBR,
-                      bool normalize) {
-  if (swapBR) {
-    for (uint32_t i = 0; i < (uint32_t)inputs.size(); i++) {
+                      bool normalize, bool grayscale) {
+  for (uint32_t i = 0; i < (uint32_t)inputs.size(); i++) {
+    if (swapBR)
       cv::cuda::cvtColor(inputs[i], inputs[i], cv::COLOR_BGR2RGB);
+    if (grayscale) {
+      cv::cuda::GpuMat gray;
+      if (swapBR) {
+        cv::cuda::cvtColor(inputs[i], gray, cv::COLOR_RGB2GRAY);
+        cv::cuda::cvtColor(gray, inputs[i], cv::COLOR_GRAY2RGB);
+      } else {
+        cv::cuda::cvtColor(inputs[i], gray, cv::COLOR_BGR2GRAY);
+        cv::cuda::cvtColor(gray, inputs[i], cv::COLOR_GRAY2BGR);
+      }
     }
   }
 
@@ -291,20 +311,21 @@ dnn::FeatureExtractor::FeatureExtractor(std::filesystem::path model_path,
   output_dim_ = model_->get_output_dims();
 }
 
-std::vector<float>
-dnn::FeatureExtractor::predict(const cv::cuda::GpuMat &gmat,
-                               const std::array<float, 3> &std,
-                               const std::array<float, 3> &mean) {
+std::vector<float> dnn::FeatureExtractor::predict(
+    const cv::cuda::GpuMat &gmat, bool swapBR, bool normalize, bool grayscale,
+    const std::array<float, 3> &std, const std::array<float, 3> &mean) {
   cv::cuda::GpuMat resized;
   cv::cuda::resize(gmat, resized, cv::Size(input_dim_[1], input_dim_[2]), 0, 0,
                    cv::INTER_AREA);
-  auto blob = blob_from_gpumat(resized, std, mean, true, true);
+  auto blob =
+      blob_from_gpumat(resized, std, mean, swapBR, normalize, grayscale);
   model_->run(blob, 1, raw_output_);
   return std::move(raw_output_);
 }
 
 std::vector<float>
 dnn::FeatureExtractor::predict(const std::vector<cv::cuda::GpuMat> &gmats,
+                               bool swapBR, bool normalize, bool grayscale,
                                const std::array<float, 3> &std,
                                const std::array<float, 3> &mean) {
   std::vector<cv::cuda::GpuMat> resized(gmats.size());
@@ -314,7 +335,8 @@ dnn::FeatureExtractor::predict(const std::vector<cv::cuda::GpuMat> &gmats,
                      cv::INTER_AREA);
   }
 
-  auto blob = blob_from_gpumat(resized, std, mean, true, true);
+  auto blob =
+      blob_from_gpumat(resized, std, mean, swapBR, normalize, grayscale);
 
   model_->run(blob, gmats.size(), raw_output_);
   return std::move(raw_output_);

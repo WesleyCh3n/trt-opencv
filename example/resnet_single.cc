@@ -20,8 +20,8 @@ void parse_args(int argc, char *argv[]) {
   options.add_options()
     ("model", "model path", cxxopts::value<std::string>())
     ("input", "single image path", cxxopts::value<std::string>())
-    ("b,batch", "batch size", cxxopts::value<int>()->default_value("512"))
-    ("m,maxbatch", "max batch size of model", cxxopts::value<int>()->default_value("512"))
+    ("b,batch", "batch size", cxxopts::value<int>()->default_value("256"))
+    ("m,maxbatch", "max batch size of model", cxxopts::value<int>()->default_value("256"))
     ("h,help", "help");
   options.parse_positional({"model", "input"});
   options.positional_help("<model path> <input img path>");
@@ -68,14 +68,13 @@ void process_single_img() {
   auto cpumat = cv::imread(global::image_path);
   auto gpumat = cv::cuda::GpuMat(cpumat);
 
-  auto r = model.predict({gpumat, gpumat});
+  // set grayscale
+  auto r = model.predict({gpumat, gpumat}, true, true, true);
 
   std::cout << r.size() << '\n';
-  for (int b = 0; b < 2; b++) {
-    for (int i = 0; i < 10; i++) {
-      std::cout << r[b * 512 + i] << ' ';
-    }
-    std::cout << std::endl;
+  for (int b = 0; b < int(r.size() / 512); b++) {
+    fmt::println("r[{}][:10]:\n{}", b,
+                 std::vector(r.begin() + b * 512, r.begin() + b * 512 + 10));
   }
 }
 
